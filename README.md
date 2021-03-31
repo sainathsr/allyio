@@ -11,6 +11,11 @@ npm install
 npm run serve
 ```
 
+### To view in local 
+```
+open localhost:8080
+```
+
 ### Compiles and minifies for production
 ```
 npm run build
