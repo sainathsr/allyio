@@ -1,6 +1,9 @@
 <template>
   <div class="okr-tree-root">
 
+      <div>
+          Click a Objective or key result to view full details
+      </div>
 <div class="filter">
       <label for="categories">Select category:</label>
 
@@ -25,7 +28,9 @@
                     
 
                    </button>
+                   <div class="objective-title" @click="openPopUp(objective)">
                    {{objective.title}}
+                   </div>
 
                </div>
 
@@ -33,7 +38,12 @@
     
                     <ul class="key-result-list" v-if="objective.expanded">
                             <li v-for="keyResult in objective.keyResults" :key="keyResult.id" class="key-result-item">
-                                    {{keyResult.title}}
+                                  
+                                  <div @click="openPopUp(keyResult,objective)" class="key-result-title">
+                                      {{keyResult.title}}
+                                  </div>
+                                    
+
                                 </li>
                     </ul>
 
@@ -41,14 +51,23 @@
 
         
         </ul>
+        <PopUp v-if="popUpVisible&&popUpObjective" :objective="popUpObjective" @close="handlePopUpClose" :parentObjective="parentObjective">
+        </PopUp>
   </div>
 </template>
 
 <script>
+import PopUp from './PopUp'
 export default {
+    components:{
+        PopUp
+    },
     data() {
         return {
-            selectedCategory: null
+            selectedCategory: null,
+            popUpVisible:false,
+            popUpObjective:null,
+            parentObjective:null,
         }
     },
     computed:
@@ -82,10 +101,21 @@ export default {
         }
     },
     methods:{
-        // deepClone(obj)
-        // {
-        //     return JSON.parse(JSON.stringify(obj))
-        // },
+        handlePopUpClose()
+        {
+            this.popUpVisible=false
+            this.popUpObjective=null
+            this.parentObjective=null
+
+        },
+        openPopUp(objective,parentObjective)
+        {
+            this.popUpObjective=objective
+            this.parentObjective=parentObjective
+            this.popUpVisible=true
+
+        },
+        
         toggleExpansion(objective)
         {
             objective.expanded=!objective.expanded
@@ -147,4 +177,9 @@ padding: 5px;
 margin-bottom: 20px;
 
 }
+
+.objective-title,.key-result-title{
+    cursor: pointer;
+}
+
 </style>
