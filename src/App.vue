@@ -1,28 +1,56 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <OKRTree :objectives="objectives"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import OKRTree from "./components/OKRTree.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
+    OKRTree
+  },
+  data() {
+    return {
+      objectives: []
+    };
+  },
+  created() {
+    let url = "https://okrcentral.github.io/sample-okrs/db.json";
+
+    this.fetchData(url).then(data => {
+      console.log('okr data fetched',data)
+
+      let objectives=data.filter(e=>!e.parent_objective_id)
+      objectives.forEach(objective => {
+        
+        objective.expanded=true
+        objective.keyResults=[]
+        objective.keyResults=data.filter(keyResult=>objective.id==keyResult.parent_objective_id)        
+      });
+    this.objectives=objectives
+
+    });
+  },
+  methods: {
+    async fetchData(url) {
+      let resp = await fetch(url);
+
+      if (resp.ok) {
+        let jsonResp = await resp.json();
+        return jsonResp.data;
+      } else {
+        throw Error("error loading OKRs from api");
+      }
+    }
   }
-}
+};
 </script>
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  margin: 50px;
 }
 </style>
